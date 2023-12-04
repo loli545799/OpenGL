@@ -1,0 +1,551 @@
+#include <windows.h>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
+#include <iostream>
+
+#include "camera.h"
+#include "scene.h"
+#include "portal.h"
+
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void curse_poscallback(GLFWwindow *window, double x, double y);
+GLFWwindow* createWindow(int width, int height, const char* title);
+int gladInit();
+
+Camera *p_camera;
+Scene *p_scene;
+
+// settings
+unsigned int SCR_WIDTH = 1280;
+unsigned int SCR_HEIGHT = 720;
+const float PI = 3.1415926;
+
+// timing
+float deltaTime = 0.0f;	// time between current frame and last frame
+float lastFrame = 0.0f;
+
+
+void mainloop(GLFWwindow *window)
+{
+    Shader shader("resources/shaders/ambient.vs", "resources/shaders/ambient.fs");
+    Scene scene;
+
+    p_scene = &scene;
+    p_camera = &scene.camera;
+
+
+    Object *tmpobj;
+    Portal *tmptal;
+
+    dolce::CollisionPlane *plane;
+    
+    // plane = new dolce::CollisionPlane;
+    // plane->direction = dolce::vec3(0, 1, 0);
+    // plane->offset = 0.2;
+    // scene.planes.push_back(plane);
+
+    // plane = new dolce::CollisionPlane;
+    // plane->direction = dolce::vec3(0, 0, 1);
+    // plane->offset = -5.9;
+    // scene.planes.push_back(plane);
+
+    // plane = new dolce::CollisionPlane;
+    // plane->direction = dolce::vec3(0, 0, -1);
+    // plane->offset = -5.9;
+    // scene.planes.push_back(plane);
+
+    // plane = new dolce::CollisionPlane;
+    // plane->direction = dolce::vec3(1, 0, 0);
+    // plane->offset = -5.9;
+    // scene.planes.push_back(plane);
+
+    // plane = new dolce::CollisionPlane;
+    // plane->direction = dolce::vec3(-1, 0, 0);
+    // plane->offset = -5.9;
+    // scene.planes.push_back(plane);
+
+    scene.portals[0].destPortal    = &scene.portals[1];
+    scene.portals[1].destPortal    = &scene.portals[0];
+
+/*
+    tmptal = new Portal();
+    tmptal->tran.scal       = glm::scale(glm::mat4(1.0f), glm::vec3(4.0f, 2.0f, 1.0f));
+    tmptal->tran.rot        = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    tmptal->tran.tran       = glm::translate(glm::mat4(1.0f), glm::vec3(0.0, 5.9, 6.0));
+    scene.walls.push_back(tmptal);
+
+    tmptal = new Portal();
+    tmptal->tran.scal       = glm::scale(glm::mat4(1.0f), glm::vec3(4.0f, 2.0f, 1.0f));
+    tmptal->tran.rot        = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    tmptal->tran.rot        = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f)) * tmptal->tran.rot;
+    tmptal->tran.tran       = glm::translate(glm::mat4(1.0f), glm::vec3(-5.9, 0.0, 6.0));
+    scene.walls.push_back(tmptal);
+
+    tmptal = new Portal();
+    tmptal->tran.scal       = glm::scale(glm::mat4(1.0f), glm::vec3(4.0f, 2.0f, 1.0f));
+    tmptal->tran.rot        = glm::rotate(glm::mat4(1.0f), glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    tmptal->tran.tran       = glm::translate(glm::mat4(1.0f), glm::vec3(0.0, 0.0, 12.0));
+    scene.walls.push_back(tmptal);
+
+    tmptal = new Portal();
+    tmptal->tran.scal       = glm::scale(glm::mat4(1.0f), glm::vec3(4.0f, 2.0f, 1.0f));
+    tmptal->tran.tran       = glm::translate(glm::mat4(1.0f), glm::vec3(0.0, 0.0, 0.1));
+    scene.walls.push_back(tmptal);
+*/
+
+    dolce::Quaternion tmporientation;
+
+    tmpobj = new Object(new Model("resources/objs/cube_blue.glb"), "cube_blue");
+    tmpobj->trans.scal  = glm::scale(glm::mat4(1.0f), glm::vec3(0.005f, 0.005f, 0.005f));
+    tmpobj->canmove = true;
+
+        tmpobj->body->setPosition(dolce::vec3(0, 2, 0));
+        tmpobj->lastPos = glm::vec3(0, 0, 2);
+        tmpobj->body->setOrientation(dolce::Quaternion(1, 0, 0, 0));
+        tmpobj->body->setVelocity(dolce::vec3(0, 0, 0));
+        tmpobj->body->setRotation(dolce::vec3(0, 0, 0));
+        tmpobj->halfsize = dolce::vec3(0.5, 0.5, 0.5);
+
+        dolce::real density = 8.0f;
+        dolce::real mass = 30;
+        tmpobj->body->setMass(mass);
+
+        dolce::mat3 tensor;
+        tensor.setBlockInertiaTensor(tmpobj->halfsize, mass);
+        tmpobj->body->setInertiaTensor(tensor);
+
+        tmpobj->body->setLinearDamping(0.95f);
+        tmpobj->body->setAngularDamping(0.8f);
+        tmpobj->body->clearAccumulators();
+        tmpobj->body->setAcceleration(dolce::vec3(0, -20.0f, 0));
+
+        tmpobj->body->setCanSleep(false);
+        tmpobj->body->setAwake();
+
+        tmpobj->body->calculateDerivedData();
+        tmpobj->calculateInternals();
+
+    scene.add_object(tmpobj);
+/*
+    tmpobj = new Object(new Model("resources/objs/cube_red.glb"), "cube_red");
+    tmpobj->trans.scal  = glm::scale(glm::mat4(1.0f), glm::vec3(0.005f, 0.005f, 0.005f));
+    tmpobj->canmove = true;
+
+        tmpobj->body->setPosition(dolce::vec3(0, 4, 0));
+        tmpobj->body->setOrientation(dolce::Quaternion(1, 0, 0, 0));
+        tmpobj->body->setVelocity(dolce::vec3(0, 0, 0));
+        tmpobj->body->setRotation(dolce::vec3(0, 0, 0));
+        tmpobj->halfsize = dolce::vec3(0.5, 0.5, 0.5);
+
+        density = 8.0f;
+        mass = 10;
+        tmpobj->body->setMass(mass);
+
+        tensor;
+        tensor.setBlockInertiaTensor(tmpobj->halfsize, mass);
+        tmpobj->body->setInertiaTensor(tensor);
+
+        tmpobj->body->setLinearDamping(0.95f);
+        tmpobj->body->setAngularDamping(0.8f);
+        tmpobj->body->clearAccumulators();
+        tmpobj->body->setAcceleration(dolce::vec3(0, -20.0f, 0));
+
+        tmpobj->body->setCanSleep(false);
+        tmpobj->body->setAwake();
+
+        tmpobj->body->calculateDerivedData();
+        tmpobj->calculateInternals();
+
+    scene.add_object(tmpobj);
+*/
+
+/*
+    tmpobj = new Object(new Model("resources/objs/dva-gun/scene.gltf"), "cube_purple");
+    tmpobj->trans.scal  = glm::scale(glm::mat4(1.0f), glm::vec3(0.005f, 0.005f, 0.005f));
+    tmpobj->canmove = true;
+
+        tmpobj->body->setPosition(dolce::vec3(3, 4, 0));
+        tmpobj->body->setOrientation(dolce::Quaternion(1, 0, 0, 0));
+        tmpobj->body->setVelocity(dolce::vec3(0, 0, 0));
+        tmpobj->body->setRotation(dolce::vec3(0, 0, 0));
+        tmpobj->halfsize = dolce::vec3(0.5, 0.5, 0.5);
+
+        density = 8.0f;
+        mass = 30;
+        tmpobj->body->setMass(mass);
+
+        tensor;
+        tensor.setBlockInertiaTensor(tmpobj->halfsize, mass);
+        tmpobj->body->setInertiaTensor(tensor);
+
+        tmpobj->body->setLinearDamping(0.95f);
+        tmpobj->body->setAngularDamping(0.8f);
+        tmpobj->body->clearAccumulators();
+        tmpobj->body->setAcceleration(dolce::vec3(0, -20.0f, 0));
+
+        tmpobj->body->setCanSleep(false);
+        tmpobj->body->setAwake();
+
+        tmpobj->body->calculateDerivedData();
+        tmpobj->calculateInternals();
+
+    scene.add_object(tmpobj);
+*/
+/*
+    tmpobj = new Object(new Model("resources/objs/cube_green.glb"), "ground1");
+    tmpobj->trans.scal  = glm::scale(glm::mat4(1.0f), glm::vec3(0.03f, 0.06f, 0.001f));
+
+        tmpobj->body->setPosition(dolce::vec3(-3.0, 0.10, 0));
+        tmpobj->body->setOrientation(dolce::Quaternion(1, 0, 0, 0));
+        
+        tmpobj->body->setVelocity(dolce::vec3(0, 0, 0));
+        tmpobj->body->setRotation(dolce::vec3(0, 0, 0));
+        tmpobj->halfsize = dolce::vec3(3.0, 0.1, 6);
+
+        density = 8.0f;
+        mass = 10;
+        tmpobj->body->setInverseMass(0);
+
+        // tensor;
+        // tensor.setBlockInertiaTensor(tmpobj->halfsize, mass);
+        // tmpobj->body->setInertiaTensor(tensor);
+        tmpobj->body->setInverseInertiaTensor(dolce::mat3());
+
+        tmpobj->body->setLinearDamping(0.95f);
+        tmpobj->body->setAngularDamping(0.8f);
+        tmpobj->body->clearAccumulators();
+        tmpobj->body->setAcceleration(dolce::vec3(0, 0, 0));
+
+        tmpobj->body->setCanSleep(false);
+        tmpobj->body->setAwake();
+
+        tmpobj->body->calculateDerivedData();
+        tmpobj->calculateInternals();
+
+    scene.add_object(tmpobj);
+
+
+    tmpobj = new Object(new Model("resources/objs/cube_yellow.glb"), "ground2");
+    tmpobj->trans.scal  = glm::scale(glm::mat4(1.0f), glm::vec3(0.03f, 0.06f, 0.001f));
+
+        tmpobj->body->setPosition(dolce::vec3(3, 0.10, 0));
+        tmpobj->body->setOrientation(dolce::Quaternion(1, 0, 0, 0));
+        
+        tmpobj->body->setVelocity(dolce::vec3(0, 0, 0));
+        tmpobj->body->setRotation(dolce::vec3(0, 0, 0));
+        tmpobj->halfsize = dolce::vec3(3.0, 0.1, 6);
+
+        density = 8.0f;
+        mass = 10;
+        tmpobj->body->setInverseMass(0);
+
+        // tensor;
+        // tensor.setBlockInertiaTensor(tmpobj->halfsize, mass);
+        // tmpobj->body->setInertiaTensor(tensor);
+        tmpobj->body->setInverseInertiaTensor(dolce::mat3());
+
+        tmpobj->body->setLinearDamping(0.95f);
+        tmpobj->body->setAngularDamping(0.8f);
+        tmpobj->body->clearAccumulators();
+        tmpobj->body->setAcceleration(dolce::vec3(0, 0, 0));
+
+        tmpobj->body->setCanSleep(false);
+        tmpobj->body->setAwake();
+
+        tmpobj->body->calculateDerivedData();
+        tmpobj->calculateInternals();
+
+    scene.add_object(tmpobj);
+
+
+    tmpobj = new Object(new Model("resources/objs/cube_purple.glb"), "wall1");
+    tmpobj->trans.scal  = glm::scale(glm::mat4(1.0f), glm::vec3(0.06f, 0.06f, 0.001f));
+
+        tmpobj->body->setPosition(dolce::vec3(0, 6.1, -6.0));
+        
+        tmporientation = dolce::Quaternion(1, 0, 0, 0);
+        tmporientation.rotate(dolce::vec3(1, 0, 0), 90);
+        tmpobj->body->setOrientation(tmporientation);
+        
+        tmpobj->body->setVelocity(dolce::vec3(0, 0, 0));
+        tmpobj->body->setRotation(dolce::vec3(0, 0, 0));
+        tmpobj->halfsize = dolce::vec3(6, 0.1, 6);
+
+        density = 8.0f;
+        mass = 10;
+        tmpobj->body->setInverseMass(0);
+
+        // tensor;
+        // tensor.setBlockInertiaTensor(tmpobj->halfsize, mass);
+        // tmpobj->body->setInertiaTensor(tensor);
+        tmpobj->body->setInverseInertiaTensor(dolce::mat3());
+
+        tmpobj->body->setLinearDamping(0.95f);
+        tmpobj->body->setAngularDamping(0.8f);
+        tmpobj->body->clearAccumulators();
+        tmpobj->body->setAcceleration(dolce::vec3(0, 0, 0));
+
+        tmpobj->body->setCanSleep(false);
+        tmpobj->body->setAwake();
+
+        tmpobj->body->calculateDerivedData();
+        tmpobj->calculateInternals();
+
+    scene.add_object(tmpobj);
+
+
+    tmpobj = new Object(new Model("resources/objs/cube_purple.glb"), "wall2");
+    tmpobj->trans.scal  = glm::scale(glm::mat4(1.0f), glm::vec3(0.06f, 0.06f, 0.001f));
+
+        tmpobj->body->setPosition(dolce::vec3(0, 6.1, 6.0));
+        
+        tmporientation = dolce::Quaternion(1, 0, 0, 0);
+        tmporientation.rotate(dolce::vec3(1, 0, 0), 90);
+        tmpobj->body->setOrientation(tmporientation);
+        
+        tmpobj->body->setVelocity(dolce::vec3(0, 0, 0));
+        tmpobj->body->setRotation(dolce::vec3(0, 0, 0));
+        tmpobj->halfsize = dolce::vec3(6, 0.1, 6);
+
+        density = 8.0f;
+        mass = 10;
+        tmpobj->body->setInverseMass(0);
+
+        // tensor;
+        // tensor.setBlockInertiaTensor(tmpobj->halfsize, mass);
+        // tmpobj->body->setInertiaTensor(tensor);
+        tmpobj->body->setInverseInertiaTensor(dolce::mat3());
+
+        tmpobj->body->setLinearDamping(0.95f);
+        tmpobj->body->setAngularDamping(0.8f);
+        tmpobj->body->clearAccumulators();
+        tmpobj->body->setAcceleration(dolce::vec3(0, 0, 0));
+
+        tmpobj->body->setCanSleep(false);
+        tmpobj->body->setAwake();
+
+        tmpobj->body->calculateDerivedData();
+        tmpobj->calculateInternals();
+
+    scene.add_object(tmpobj);
+
+
+    tmpobj = new Object(new Model("resources/objs/cube_pink.glb"), "wall3");
+    tmpobj->trans.scal  = glm::scale(glm::mat4(1.0f), glm::vec3(0.06f, 0.06f, 0.001f));
+
+        tmpobj->body->setPosition(dolce::vec3(-6.0, 6.1, 0));
+        
+        tmporientation = dolce::Quaternion(1, 0, 0, 0);
+        tmporientation.rotate(dolce::vec3(0, 0, 1), 90);
+        tmpobj->body->setOrientation(tmporientation);
+        
+        tmpobj->body->setVelocity(dolce::vec3(0, 0, 0));
+        tmpobj->body->setRotation(dolce::vec3(0, 0, 0));
+        tmpobj->halfsize = dolce::vec3(6, 0.1, 6);
+
+        density = 8.0f;
+        mass = 10000;
+        tmpobj->body->setInverseMass(0);
+
+        // tensor;
+        // tensor.setBlockInertiaTensor(tmpobj->halfsize, mass);
+        // tmpobj->body->setInertiaTensor(tensor);
+        tmpobj->body->setInverseInertiaTensor(dolce::mat3());
+
+        tmpobj->body->setLinearDamping(0.95f);
+        tmpobj->body->setAngularDamping(0.8f);
+        tmpobj->body->clearAccumulators();
+        tmpobj->body->setAcceleration(dolce::vec3(0, 0, 0));
+
+        tmpobj->body->setCanSleep(false);
+        tmpobj->body->setAwake();
+
+        tmpobj->body->calculateDerivedData();
+        tmpobj->calculateInternals();
+
+    scene.add_object(tmpobj);
+
+    
+
+    tmpobj = new Object(new Model("resources/objs/cube_pink.glb"), "wall4");
+    tmpobj->trans.scal  = glm::scale(glm::mat4(1.0f), glm::vec3(0.06f, 0.06f, 0.001f));
+
+        tmpobj->body->setPosition(dolce::vec3(6.0, 6.1, 0));
+        
+        tmporientation = dolce::Quaternion(1, 0, 0, 0);
+        tmporientation.rotate(dolce::vec3(0, 0, 1), 90);
+        tmpobj->body->setOrientation(tmporientation);
+        
+        tmpobj->body->setVelocity(dolce::vec3(0, 0, 0));
+        tmpobj->body->setRotation(dolce::vec3(0, 0, 0));
+        tmpobj->halfsize = dolce::vec3(6, 0.1, 6);
+
+        density = 8.0f;
+        mass = 10000;
+        tmpobj->body->setInverseMass(0);
+
+        // tensor;
+        // tensor.setBlockInertiaTensor(tmpobj->halfsize, mass);
+        // tmpobj->body->setInertiaTensor(tensor);
+        tmpobj->body->setInverseInertiaTensor(dolce::mat3());
+
+        tmpobj->body->setLinearDamping(0.95f);
+        tmpobj->body->setAngularDamping(0.8f);
+        tmpobj->body->clearAccumulators();
+        tmpobj->body->setAcceleration(dolce::vec3(0, 0, 0));
+
+        tmpobj->body->setCanSleep(false);
+        tmpobj->body->setAwake();
+
+        tmpobj->body->calculateDerivedData();
+        tmpobj->calculateInternals();
+
+    scene.add_object(tmpobj);
+*/
+
+    scene.init("config/conf.txt");
+
+
+    scene.camera.Position = glm::vec3(0, -3, 4);
+    glEnable(GL_DEPTH_TEST);
+
+
+    while (!glfwWindowShouldClose(window)) {
+        
+        // per-frame time logic
+        float currentFrame = static_cast<float>(glfwGetTime());
+        deltaTime = currentFrame - lastFrame;
+        if (deltaTime < 0.001) continue;
+        lastFrame = currentFrame;
+    
+
+        scene.processInput(window, deltaTime);
+    
+        scene.update();
+
+        glClearColor(0, 0.3, 0.2, 1);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        shader.use();
+        scene.draw_all(shader);
+
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+
+    }
+
+
+
+}
+
+
+
+int main()
+{
+    glfwInit();
+
+    GLFWwindow* window = createWindow(SCR_WIDTH, SCR_HEIGHT, "portal");
+
+    gladInit();
+
+    mainloop(window);
+
+    glfwTerminate();
+
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+//========================================================================================
+//========================================================================================
+
+
+
+
+
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+    // make sure the viewport matches the new window dimensions; note that width and 
+    // height will be significantly larger than specified on retina displays.
+    glViewport(0, 0, width, height);
+    SCR_HEIGHT = height;
+    SCR_WIDTH = width;
+}
+
+void curse_poscallback(GLFWwindow *window, double xposIn, double yposIn)
+{
+    static float lastX = SCR_WIDTH / 2.0f;
+    static float lastY = SCR_HEIGHT / 2.0f;
+    static bool firstMouse = true;
+
+
+    float xpos = static_cast<float>(xposIn);
+    float ypos = static_cast<float>(yposIn);
+    
+
+    if (firstMouse)
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+    //std::cout <<lastX <<" " <<lastY <<"->" <<xpos <<" " <<ypos <<"(" <<xposIn <<" " <<yposIn <<")" <<std::endl;
+
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+
+    lastX = xpos;
+    lastY = ypos;
+
+    p_camera->ProcessMouseMovement(xoffset, yoffset);
+}
+
+
+//========================================================================================
+//========================================================================================
+
+GLFWwindow* createWindow(int width, int height, const char* title)
+{
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+    GLFWwindow* window = glfwCreateWindow(width, height, title, NULL, NULL);
+    if (window == NULL)
+    {
+        std::cout << "Failed to create GLFW window" << std::endl;
+        glfwTerminate();
+        return NULL;
+    }
+    glfwMakeContextCurrent(window);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    
+    glfwSetCursorPosCallback(window, curse_poscallback);
+
+    //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+    return window;
+}
+
+int gladInit()
+{
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    {
+        std::cout << "Failed to initialize GLAD" << std::endl;
+        return -1;
+    }
+    return 0;
+}
+

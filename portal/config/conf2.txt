@@ -1,0 +1,11 @@
+[ cube3 ]
+	type	=	normal_obj
+	path	=	resources/objs/portal_2_turret.glb
+	canmove	=	1
+	scal_all	=	0.5
+	tran_z	=	-0.5
+	pos_x	=	3
+	pos_y	=	5
+	pos_z	=	1
+	halfsz_all	=	0.5
+	density	=	8

@@ -1,0 +1,11 @@
+Model Information:
+* title:	Tracer's gun
+* source:	https://sketchfab.com/3d-models/tracers-gun-be224b992aec44319ce128119e3249c5
+* author:	Drawnah (https://sketchfab.com/EzequielMunoz)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Tracer's gun" (https://sketchfab.com/3d-models/tracers-gun-be224b992aec44319ce128119e3249c5) by Drawnah (https://sketchfab.com/EzequielMunoz) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

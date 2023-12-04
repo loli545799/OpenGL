@@ -1,0 +1,227 @@
+[ plane1_ground ]
+	type	=	half_plane
+	dir_x	=	0
+	dir_y	=	0
+	dir_z	=	1
+	offset	=	0.2
+
+[ plane2_F ]
+	type	=	half_plane
+	dir_x	=	0
+	dir_y	=	-1
+	dir_z	=	0
+	offset	=	-5.85
+
+[ plane3_B ]
+	type	=	half_plane
+	dir_x	=	0
+	dir_y	=	1
+	dir_z	=	0
+	offset	=	-5.85
+
+[ plane3_L ]
+	type	=	half_plane
+	dir_x	=	1
+	dir_y	=	0
+	dir_z	=	0
+	offset	=	-6
+
+[ plane4_R ]
+	type	=	half_plane
+	dir_x	=	-1
+	dir_y	=	0
+	dir_z	=	0
+	offset	=	-5.85
+
+[ plane5_U ]
+	type	=	half_plane
+	dir_x	=	0
+	dir_y	=	0
+	dir_z	=	-1
+	offset	=	-12
+
+
+
+
+[ vw1_F ]
+	type	=	virtual_wall
+	scal_x	=	4
+	scal_y	=	2
+	scal_z	=	1
+	scal_all	=	1
+	rot_x	=	90
+	tran_y	=	5.9
+	tran_z	=	6
+
+[ vw2_B ]
+	type	=	virtual_wall
+	scal_x	=	4
+	scal_y	=	2
+	scal_z	=	1
+	scal_all	=	1
+	rot_x	=	90
+	rot_z	=	180
+	tran_y	=	-5.9
+	tran_z	=	6
+
+[ vw3_L ]
+	type	=	virtual_wall
+	scal_x	=	4
+	scal_y	=	2
+	rot_x	=	90
+	rot_z	=	90
+	tran_x	=	-5.9
+	tran_z	=	6
+
+[ vw4_R ]
+	type	=	virtual_wall
+	scal_x	=	4
+	scal_y	=	2
+	rot_x	=	90
+	rot_z	=	-90
+	tran_x	=	5.9
+	tran_z	=	6
+
+[ vw5_U ]
+	type	=	virtual_wall
+	scal_x	=	4
+	scal_y	=	2
+	rot_x	=	180
+	tran_z	=	12
+
+[ vw6_D ]
+	type	=	virtual_wall
+	scal_x	=	4
+	scal_y	=	2
+	tran_z	=	0.12
+
+
+[ cube0_myself ]
+	type	=	normal_obj
+	canmove	=	1
+	path	=	resources/objs/cube_blue.glb
+	scal_x	=	1
+	scal_y	=	1
+	scal_z	=	1
+	scal_all	=	0.005
+	pos_x	=	0
+	pos_y	=	0
+	pos_z	=	2
+	halfsz_x	=	1
+	halfsz_y	=	1
+	halfsz_z	=	1
+	halfsz_all	=	0.5
+	density	=	8
+	
+[ cube 1_light ]
+	type	=	normal_obj
+	canmove	=	1
+	path	=	resources/objs/sun/sun.obj
+	scal_all	=	0.001
+	pos_x	=	4
+	pos_y	=	5
+	pos_z	=	7
+	halfsz_x	=	1
+	halfsz_y	=	1
+	halfsz_z	=	1
+	halfsz_all	=	0.5
+	density	=	8
+
+[ cube2 ]
+	type	=	normal_obj
+	path	=	resources/objs/portal_cube/scene.gltf
+	canmove	=	1
+	scal_all	=	0.23
+	pos_x	=	-4
+	pos_y	=	5
+	pos_z	=	4
+	halfsz_all	=	0.5
+	density	=	8
+
+[ ground1 ]
+	type	=	normal_obj
+	path	=	resources/objs/cube_green.glb
+	canmove	=	0
+	scal_x	=	3
+	scal_y	=	6
+	scal_z	=	0.1
+	scal_all	=	0.01
+	pos_x	=	-3
+	pos_z	=	0.1
+	halfsz_x	=	3
+	halfsz_y	=	6
+	halfsz_z	=	0.1
+
+[ ground2 ]
+	type	=	normal_obj
+	path	=	resources/objs/cube_yellow.glb
+	canmove	=	0
+	scal_x	=	3
+	scal_y	=	6
+	scal_z	=	0.1
+	scal_all	=	0.01
+	pos_x	=	3
+	pos_z	=	0.1
+	halfsz_x	=	3
+	halfsz_y	=	6
+	halfsz_z	=	0.1
+	
+[ wall_F ]
+	type	=	normal_obj
+	path	=	resources/objs/cube_purple.glb
+	canmove	=	0
+	scal_x	=	6
+	scal_y	=	6
+	scal_z	=	0.1
+	scal_all	=	0.01
+	pos_y	=	6
+	pos_z	=	6.1
+	rot_x	=	90
+	halfsz_x	=	6
+	halfsz_y	=	6
+	halfsz_z	=	0.1
+
+[ wall_B ]
+	type	=	normal_obj
+	path	=	resources/objs/cube_purple.glb
+	canmove	=	0
+	scal_x	=	6
+	scal_y	=	6
+	scal_z	=	0.1
+	scal_all	=	0.01
+	pos_y	=	-6
+	pos_z	=	6.1
+	rot_x	=	90
+	halfsz_x	=	6
+	halfsz_y	=	6
+	halfsz_z	=	0.1
+
+[ wall_L ]
+	type	=	normal_obj
+	path	=	resources/objs/cube_pink.glb
+	canmove	=	0
+	scal_x	=	6
+	scal_y	=	6
+	scal_z	=	0.1
+	scal_all	=	0.01
+	pos_x	=	-6
+	pos_z	=	6.1
+	rot_y	=	90
+	halfsz_x	=	6
+	halfsz_y	=	6
+	halfsz_z	=	0.1
+
+[ wall_R ]
+	type	=	normal_obj
+	path	=	resources/objs/cube_pink.glb
+	canmove	=	0
+	scal_x	=	6
+	scal_y	=	6
+	scal_z	=	0.1
+	scal_all	=	0.01
+	pos_x	=	6
+	pos_z	=	6.1
+	rot_y	=	90
+	halfsz_x	=	6
+	halfsz_y	=	6
+	halfsz_z	=	0.1
